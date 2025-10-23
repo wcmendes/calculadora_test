@@ -1,7 +1,7 @@
 # calculator/core.py
 
 def add(a, b):
-    """Soma dois números"""
+    """Soma dois números."""
     return a + b
 
 def subtract(a, b):
