@@ -1,0 +1,69 @@
+# Nome do workflow (vai aparecer na aba "Actions" do GitHub)
+name: Pipeline de CI/CD da Calculadora
+
+# 1. GATILHOS (Triggers)
+# Quando este pipeline deve rodar?
+on:
+  push:
+    branches: [ main ]  # Ao enviar código para a branch 'main'
+  pull_request:
+    branches: [ main ]  # Ao abrir um Pull Request para a 'main'
+
+# 2. TAREFAS (Jobs)
+# O que o pipeline deve fazer?
+jobs:
+  # ------ TAREFA DE TESTE (Continuous Integration) ------
+  test:
+    name: Rodar Testes Unitários
+    # Usar a versão mais recente do Ubuntu como "máquina virtual"
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1º Passo: Baixar o código do repositório
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      # 2º Passo: Configurar o ambiente Python
+      - name: Configurar Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 3º Passo: Instalar as dependências do projeto
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      # 4º Passo: Rodar os testes (o comando 'pytest')
+      - name: Rodar testes com pytest
+        run: |
+          pytest
+
+  # ------ TAREFA DE DEPLOY (Continuous Deployment) ------
+  # Esta tarefa só roda se a tarefa 'test' for bem-sucedida
+  deploy:
+    name: Deploy (Simulação)
+    # Depende da tarefa 'test'
+    needs: test
+    
+    # Condição: Só rodar se for um PUSH na branch MAIN
+    # (Não queremos fazer deploy em Pull Requests)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Simulando Deploy para Produção"
+        run: |
+          echo "Todos os testes passaram!"
+          echo "Iniciando o deploy..."
+          # -----------------------------------------------------------
+          # AQUI ENTRARIA SEU SCRIPT DE DEPLOY REAL:
+          # Ex: Conectar via SSH e copiar os arquivos
+          # Ex: `eb deploy` (para AWS Elastic Beanstalk)
+          # Ex: `gcloud app deploy` (para Google Cloud)
+          # Ex: `heroku push` (para Heroku)
+          # -----------------------------------------------------------
+          sleep 5 # Simula um tempo de deploy
+          echo "Deploy realizado com sucesso!"
