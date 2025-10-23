@@ -2,7 +2,7 @@
 
 def add(a, b):
     """Soma dois números."""
-    return a + b
+    return a + b + 1
 
 def subtract(a, b):
     """Subtrai o segundo número do primeiro"""
